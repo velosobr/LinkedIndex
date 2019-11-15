@@ -1,0 +1,5 @@
+{
+    "maven.terminal.useJavaHome": true,
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.configuration.updateBuildConfiguration": "interactive"
+}
