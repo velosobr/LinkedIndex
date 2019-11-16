@@ -92,7 +92,7 @@
         $.getJSON("/api/products", function (data) {
             $.each(data, function (key, val) {
                 if(val){
-                    $("<tr><td>" + val.name + "</td><td>" + val.label + "</td><td>" + val.type 
+                    $("<tr><td>" + val.name + "</td><td>" + val.label + "</td><td>" + val.type + 
                     + "</td><td>" + val.value + "</td></tr>").appendTo("#content");
                 }
             });

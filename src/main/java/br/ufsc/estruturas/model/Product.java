@@ -4,9 +4,13 @@ public class Product {
 	private String name;
 	private String label;
 	private String type;
-	private float value;
+	private String value;
 
-	public Product(String name, String label, String type, float value) {
+	public Product(){
+		
+	}
+
+	public Product(String name, String label, String type, String value) {
 		super();
 		this.name = name;
 		this.label = label;
@@ -38,11 +42,11 @@ public class Product {
 		this.type = type;
 	}
 
-	public float getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(float value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 
