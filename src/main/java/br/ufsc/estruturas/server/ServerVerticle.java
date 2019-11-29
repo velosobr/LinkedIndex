@@ -1,6 +1,7 @@
 package br.ufsc.estruturas.server;
 
 import java.util.HashMap;
+import java.util.List;
 
 import br.ufsc.estruturas.data.DataProducts;
 import br.ufsc.estruturas.indexation.DirInvertedIndex;
@@ -31,6 +32,7 @@ public class ServerVerticle extends AbstractVerticle {
 		router.route().handler(BodyHandler.create());
 		router.post("/api/products").handler(this::addProduct);
 		router.get("/api/products").handler(this::getAll);
+		router.post("/api/label").handler(this::getProductsByLabel);
 		router.route("/").handler(ctx -> {
 			ctx.response().sendFile("assets/index.html");
 		});
@@ -45,7 +47,6 @@ public class ServerVerticle extends AbstractVerticle {
 					}
 				});
 
-		future.complete();
 	}
 
 	
@@ -61,6 +62,23 @@ public class ServerVerticle extends AbstractVerticle {
 			Product[] products = dataProducts.getProducts();
 			String json = Json.encodePrettily(products);
 			routingContext.response().putHeader("content-type", "application/json; charset=utf-8").end(json);	
+		} catch (Exception e) {
+			//TODO: handle exception
+		}		
+	}
+
+	/** 
+	 * Metodo responsavel responder a requisição do tipo GET
+	 * Ele busca todos os produtos por Label, converte eles em json e atribui esse
+	 * json ao corpo da requisição. 
+	 * @param routingContext
+	*/
+	private void getProductsByLabel(RoutingContext routingContext) {
+		try {
+			List<Product> products = dataProducts.getByLabel(routingContext.getBodyAsString());
+			String json = Json.encodePrettily(products);
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(json));	
 		} catch (Exception e) {
 			//TODO: handle exception
 		}		
