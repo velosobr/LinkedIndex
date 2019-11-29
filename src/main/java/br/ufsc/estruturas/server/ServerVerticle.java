@@ -15,7 +15,13 @@ import io.vertx.ext.web.handler.BodyHandler;
 public class ServerVerticle extends AbstractVerticle {
 	private DataProducts dataProducts;	
 
-	//Metodo responsavel por criar o server
+	
+	/** 
+	 * Metodo responsavel por criar o server, recebe como parametro um future object
+	 * que é assíncrono
+	 * @param future
+	 * @throws InterruptedException
+	 */
 	@Override
 	public void start(Future<Void> future) throws InterruptedException {
 		mockOfProducts();
@@ -38,12 +44,16 @@ public class ServerVerticle extends AbstractVerticle {
 						future.fail(result.cause());
 					}
 				});
+
+		future.complete();
 	}
 
-	/*
-	* Metodo responsavel responder a requisição do tipo GET
-	* Ele busca todos os produtos, converte eles em json e atribui esse
-	* json ao corpo da requisição. 
+	
+	/** 
+	 * Metodo responsavel responder a requisição do tipo GET
+	 * Ele busca todos os produtos, converte eles em json e atribui esse
+	 * json ao corpo da requisição. 
+	 * @param routingContext
 	*/
 	
 	private void getAll(RoutingContext routingContext) {
@@ -56,11 +66,13 @@ public class ServerVerticle extends AbstractVerticle {
 		}		
 	}
 
-	/*
-	* Metodo responsavel responder a requisição do tipo POST
-	* Ele recebe um produto no formato Json digitado pelo usuario, decodifica para um objeto da classe Product
-	* Depois insere esse produto.
-	* Ao final responde a requisição feita com o produto inserido para ser renderizado na tela
+	
+	/** 
+	 * Metodo responsavel responder a requisição do tipo POST
+	 * Ele recebe um produto no formato Json digitado pelo usuario, decodifica para um objeto da classe Product
+	 * Depois insere esse produto.
+	 * Ao final responde a requisição feita com o produto inserido para ser renderizado na tela
+	 * @param routingContext
 	*/
 	private void addProduct(RoutingContext routingContext) {
 		Product product = Json.decodeValue(routingContext.getBodyAsString(), Product.class);
@@ -69,8 +81,8 @@ public class ServerVerticle extends AbstractVerticle {
 		 		.end(Json.encodePrettily(product));
 	}
 
-	/*
-	* Mock com produtos criados e inseridos para que exista dados para exibir na tela
+	/**
+	 * Mock com produtos criados e inseridos para que exista dados para exibir na tela
 	*/
 	public void mockOfProducts() {
 		Product p = new Product("Pringles", "Nestle", "Salgadinho", "12");
