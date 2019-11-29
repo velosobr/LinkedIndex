@@ -7,7 +7,7 @@ API REST Simples com o uso do Vert.x 3 e as dependências do CORE e WEB.
 
 ## Para acessar a página web utilize 
 
-`http://localhost:9000/assets/index.html`
+`http://localhost:9000`
 
 ## Executando os Endpoints:
 

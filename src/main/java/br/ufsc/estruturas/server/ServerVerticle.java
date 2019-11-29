@@ -7,34 +7,29 @@ import br.ufsc.estruturas.indexation.DirInvertedIndex;
 import br.ufsc.estruturas.model.Product;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.StaticHandler;
 
 public class ServerVerticle extends AbstractVerticle {
-	private DataProducts dataProducts;
-	
+	private DataProducts dataProducts;	
 
+	//Metodo responsavel por criar o server
 	@Override
 	public void start(Future<Void> future) throws InterruptedException {
-		testando();
+		mockOfProducts();
 		
-		Router router = Router.router(vertx);
-
-		router.route("/").handler(routingContext -> {
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "text/html").end("<h1>Meu Primeiro Server com Vertx Funcionando</h1>");
-		});
-
-		router.route("/assets/*").handler(StaticHandler.create("assets"));
-
-		router.route("/api/products*").handler(BodyHandler.create());
+		//Criação das Rotas
+		Router router = Router.router(vertx);		
+		router.route().handler(BodyHandler.create());
 		router.post("/api/products").handler(this::addProduct);
 		router.get("/api/products").handler(this::getAll);
+		router.route("/").handler(ctx -> {
+			ctx.response().sendFile("assets/index.html");
+		});
 		
+		//Iniciando HttpServer na porta 9000
 		vertx.createHttpServer().requestHandler(router::accept).listen(config().getInteger("http.port", 9000),
 				result -> {
 					if (result.succeeded()) {
@@ -45,20 +40,39 @@ public class ServerVerticle extends AbstractVerticle {
 				});
 	}
 
+	/*
+	* Metodo responsavel responder a requisição do tipo GET
+	* Ele busca todos os produtos, converte eles em json e atribui esse
+	* json ao corpo da requisição. 
+	*/
+	
 	private void getAll(RoutingContext routingContext) {
-		routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-				.end(Json.encodePrettily(dataProducts.getProducts()));
+		try {
+			Product[] products = dataProducts.getProducts();
+			String json = Json.encodePrettily(products);
+			routingContext.response().putHeader("content-type", "application/json; charset=utf-8").end(json);	
+		} catch (Exception e) {
+			//TODO: handle exception
+		}		
 	}
 
+	/*
+	* Metodo responsavel responder a requisição do tipo POST
+	* Ele recebe um produto no formato Json digitado pelo usuario, decodifica para um objeto da classe Product
+	* Depois insere esse produto.
+	* Ao final responde a requisição feita com o produto inserido para ser renderizado na tela
+	*/
 	private void addProduct(RoutingContext routingContext) {
-		System.out.println(routingContext.getBodyAsString().length());
 		Product product = Json.decodeValue(routingContext.getBodyAsString(), Product.class);
 		dataProducts.insertProduct(product);
 		routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
-				.end(Json.encodePrettily(product));
+		 		.end(Json.encodePrettily(product));
 	}
 
-	public void testando() {
+	/*
+	* Mock com produtos criados e inseridos para que exista dados para exibir na tela
+	*/
+	public void mockOfProducts() {
 		Product p = new Product("Pringles", "Nestle", "Salgadinho", "12");
 		Product p1 = new Product("Trakinas", "Mondelez", "Bolacha", "3");
 		Product p2 = new Product("Lã de aço", "BomBril", "Limpeza", "2");
