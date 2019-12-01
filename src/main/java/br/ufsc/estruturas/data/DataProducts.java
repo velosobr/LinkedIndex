@@ -66,6 +66,19 @@ public class DataProducts {
 	}
 
 	/** 
+	 * @param label
+	 * @return Product
+	 */
+	public Product getById(int id) {
+		for (Product p : getProducts()) {
+			if(p.getId() == id){
+				return p;
+			}
+		}
+		return null;
+	}
+
+	/** 
 	 * @param type
 	 * @return List<Product>
 	 */

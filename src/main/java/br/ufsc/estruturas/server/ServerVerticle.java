@@ -38,6 +38,7 @@ public class ServerVerticle extends AbstractVerticle {
 		router.post("/api/label").handler(this::getProductsByLabel);
 		router.post("/api/type").handler(this::getProductsByType);
 		router.post("/api/typelabel").handler(this::getProductsByTypeAndLabel);
+		router.post("/api/id").handler(this::getProductsById);
 		router.route("/").handler(ctx -> {
 			ctx.response().sendFile("assets/index.html");
 		});
@@ -83,6 +84,28 @@ public class ServerVerticle extends AbstractVerticle {
 			JsonObject jsonObject = routingContext.getBodyAsJson();
 			List<Product> products = dataProducts.getByLabel(jsonObject.getString("label"));
 			String json = Json.encodePrettily(products);
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(json));	
+		} catch (NullPointerException e) {
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(null));	
+		} catch (Exception ex){
+
+		}	
+	}
+
+	/** 
+	 * Metodo responsavel responder a requisição do tipo POST
+	 * Ele busca todos os produtos por Label, converte eles em json e atribui esse
+	 * json ao corpo da requisição. 
+	 * @param routingContext
+	*/
+	private void getProductsById(RoutingContext routingContext) {
+		try {
+			Product[] product = new Product[1];
+			JsonObject jsonObject = routingContext.getBodyAsJson();
+			product[0] = dataProducts.getById(Integer.parseInt(jsonObject.getString("id")));
+			String json = Json.encodePrettily(product);
 			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
 		 		.end(Json.encodePrettily(json));	
 		} catch (NullPointerException e) {
