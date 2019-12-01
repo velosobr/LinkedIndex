@@ -76,7 +76,7 @@ public class ServerVerticle extends AbstractVerticle {
 	/** 
 	 * Metodo responsavel responder a requisição do tipo POST
 	 * Ele busca todos os produtos por Label, converte eles em json e atribui esse
-	 * json ao corpo da requisição. 
+	 * json ao corpo da requisição, se não existir retorna null
 	 * @param routingContext
 	*/
 	private void getProductsByLabel(RoutingContext routingContext) {
@@ -96,8 +96,8 @@ public class ServerVerticle extends AbstractVerticle {
 
 	/** 
 	 * Metodo responsavel responder a requisição do tipo POST
-	 * Ele busca todos os produtos por Label, converte eles em json e atribui esse
-	 * json ao corpo da requisição. 
+	 * Ele busca todo o produtos por id, converte ele em json e atribui esse
+	 * json ao corpo da requisição, se não existir retorna null
 	 * @param routingContext
 	*/
 	private void getProductsById(RoutingContext routingContext) {
@@ -119,7 +119,7 @@ public class ServerVerticle extends AbstractVerticle {
 	/** 
 	 * Metodo responsavel responder a requisição do tipo POST
 	 * Ele busca todos os produtos por Type, converte eles em json e atribui esse
-	 * json ao corpo da requisição. 
+	 * json ao corpo da requisição, se não existir retorna null 
 	 * @param routingContext
 	*/
 	private void getProductsByType(RoutingContext routingContext) {
@@ -139,8 +139,9 @@ public class ServerVerticle extends AbstractVerticle {
 
 	/** 
 	 * Metodo responsavel responder a requisição do tipo POST
-	 * Ele busca todos os produtos por Type, converte eles em json e atribui esse
-	 * json ao corpo da requisição. 
+	 * Ele busca todos os produtos por Type e Label, verifica qual é a menor lista e faz a união dos
+	 * produtos encontrados, converte eles em json e atribui esse
+	 * json ao corpo da requisição, se não existir retorna null
 	 * @param routingContext
 	*/
 	private void getProductsByTypeAndLabel(RoutingContext routingContext) {
