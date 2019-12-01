@@ -3,6 +3,11 @@ package br.ufsc.estruturas.main;
 import br.ufsc.estruturas.server.ServerVerticle;
 import io.vertx.core.Vertx;
 
+/**
+ * Desenvolvido por Rafaela Bernardo Rodrigues e 
+ *	Willian Bernardo
+ *
+ */
 public class Run {
 
 	

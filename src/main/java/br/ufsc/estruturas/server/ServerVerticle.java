@@ -1,5 +1,6 @@
 package br.ufsc.estruturas.server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -36,6 +37,7 @@ public class ServerVerticle extends AbstractVerticle {
 		router.get("/api/products").handler(this::getAll);
 		router.post("/api/label").handler(this::getProductsByLabel);
 		router.post("/api/type").handler(this::getProductsByType);
+		router.post("/api/typelabel").handler(this::getProductsByTypeAndLabel);
 		router.route("/").handler(ctx -> {
 			ctx.response().sendFile("assets/index.html");
 		});
@@ -111,6 +113,44 @@ public class ServerVerticle extends AbstractVerticle {
 
 		}	
 	}
+
+	/** 
+	 * Metodo responsavel responder a requisição do tipo POST
+	 * Ele busca todos os produtos por Type, converte eles em json e atribui esse
+	 * json ao corpo da requisição. 
+	 * @param routingContext
+	*/
+	private void getProductsByTypeAndLabel(RoutingContext routingContext) {
+		try {
+			JsonObject jsonObject = routingContext.getBodyAsJson();
+			String type = jsonObject.getString("type");
+			String label = jsonObject.getString("label");
+			List<Product> productsByType = dataProducts.getByType(type);
+			List<Product> productsByLabel = dataProducts.getByLabel(label);
+			List<Product> products = new ArrayList<>();
+			if(productsByType.size() > productsByLabel.size()){
+				for (Product product : productsByLabel) {
+					if(productsByType.contains(product)){
+						products.add(product);
+					}
+				}
+			} else{
+				for (Product product : productsByType) {
+					if(productsByLabel.contains(product)){
+						products.add(product);
+					}
+				}
+			}
+			String json = Json.encodePrettily(products);
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(json));	
+		} catch (NullPointerException e) {
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(null));	
+		} catch (Exception ex){
+
+		}	
+	}
 	
 	/** 
 	 * Metodo responsavel responder a requisição do tipo POST
@@ -130,10 +170,10 @@ public class ServerVerticle extends AbstractVerticle {
 	 * Mock com produtos criados e inseridos para que exista dados para exibir na tela
 	*/
 	public void mockOfProducts() {
-		Product p = new Product("Pringles", "Nestle", "Salgadinho", "12");
-		Product p1 = new Product("Trakinas", "Mondelez", "Bolacha", "3");
-		Product p2 = new Product("Lã de aço", "BomBril", "Limpeza", "2");
-		Product p3 = new Product("Cheetos", "Nestle", "Salgadinho", "12");
+		Product p = new Product(1, "Pringles", "Nestle", "Salgadinho", "12");
+		Product p1 = new Product(2, "Trakinas", "Mondelez", "Bolacha", "3");
+		Product p2 = new Product(3, "Lã de aço", "BomBril", "Limpeza", "2");
+		Product p3 = new Product(4, "Cheetos", "Nestle", "Salgadinho", "12");
 
 		this.dataProducts = new DataProducts(new Product[10], new DirInvertedIndex(new TreeMap<>(String.CASE_INSENSITIVE_ORDER)),
 				new DirInvertedIndex(new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));

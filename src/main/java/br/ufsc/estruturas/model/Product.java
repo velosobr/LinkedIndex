@@ -17,12 +17,13 @@ public class Product {
 	 * @param type
 	 * @param value
 	 */
-	public Product(String name, String label, String type, String value) {
+	public Product(int id,String name, String label, String type, String value) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.type = type;
 		this.value = value;
+		this.id = id;
 	}
 
 	/** 
