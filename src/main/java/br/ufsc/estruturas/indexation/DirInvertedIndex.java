@@ -1,17 +1,17 @@
 package br.ufsc.estruturas.indexation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DirInvertedIndex {
-	private HashMap<String, List<Integer>> dir;
+	private Map<String, List<Integer>> dir;
 	
 	/** 
 	 * @param dir
 	 * 
 	 */
-	public DirInvertedIndex(HashMap<String, List<Integer>> dir) {
+	public DirInvertedIndex(Map<String, List<Integer>> dir) {
 		this.dir = dir;
 	}
 

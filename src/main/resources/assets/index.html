@@ -1,14 +1,12 @@
  
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Lista de Contatos</title>
-
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="container" role="main">
@@ -16,15 +14,19 @@
         <div class="row">
             <div class="col-md-12">
                 <h1>Meus Produtos</h1>
-                <button class="pull-right btn btn-primary getByLabel" data-action="modal" data-toggle="modal"
+                <button style="margin: 0.5vh;" class="pull-right btn btn-primary" data-action="search-t" data-toggle="modal"
+                        data-target="#typeModal">
+                    <span class="glyphicon glyphicon-plus"></span> Buscar Por Tipo
+                </button>
+                <button style="margin: 0.5vh;" class="pull-right btn btn-primary" data-action="search" data-toggle="modal"
                         data-target="#labelModal">
                     <span class="glyphicon glyphicon-plus"></span> Buscar Por Marca
                 </button>
-                <button class="pull-right btn btn-primary product-add" data-action="add" data-toggle="modal"
+                <button style="margin: 0.5vh;" class="pull-right btn btn-primary" data-action="add" data-toggle="modal"
                         data-target="#productModal">
                     <span class="glyphicon glyphicon-plus"></span> Adicionar Produtos
                 </button>
-                <table class="table table-striped">
+                <table class="table table-condensed">
                     <thead>
                     <tr>
                         <th>Nome</th>
@@ -80,29 +82,54 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                <h4 class="modal-title" id="productModalTitle">Buscar Prodduto - Marca</h4>
+                <h4 class="modal-title" id="searchLabelModalTitle">Buscar Produto - Marca</h4>
             </div>
             <div class="modal-body">
                 <form>
                     <div class="form-group">
-                        <label for="product-label" class="control-label">Marca:</label>
-                        <input type="text" class="form-control" id="product-label">
+                        <label for="search-label" class="control-label">Marca:</label>
+                        <input type="text" class="form-control" id="search-label">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="productAction" class="btn btn-primary">Buscar</button>
+                <button type="button" id="searchLabel" class="btn btn-primary">Buscar</button>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="typeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title" id="searchTypeModalTitle">Buscar Produto - Tipo</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="search-type" class="control-label">Tipo:</label>
+                        <input type="text" class="form-control" id="search-type">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="searchType" class="btn btn-primary">Buscar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(function () {
         load();
         createModal();
         labelModal();
+        typeModal();
     });
+
     function create(nome, label, type, value) {
         $.post("/api/products", JSON.stringify(
           {
@@ -113,6 +140,40 @@
     }), function () {
             load();
         }, "json");
+    }
+
+    function searchByLabel(label) {
+        $.post("/api/label", JSON.stringify(
+          {           
+            label: label            
+    }), function (msg) {
+        updateTable(msg)
+        }, "json");
+    }
+
+    function searchByType(type) {
+        $.post("/api/type", JSON.stringify(
+          {           
+            type: type            
+    }), function (msg) {
+        updateTable(msg)
+        }, "json");
+    }
+
+    function updateTable(data){
+        $("#content").children().remove();
+        if(data){
+            var parsedData = $.parseJSON(data);
+            console.log(parsedData);
+            $.each(parsedData, function (i, item) {
+                if(item){
+                    $("<tr><td>" + parsedData[i]["name"] + "</td><td>" + parsedData[i]["label"] + "</td><td>" + parsedData[i]["type"]
+                    + "</td><td>" + parsedData[i]["value"] + "</td></tr>").appendTo("#content");
+                }
+            });
+        } else{
+            $("<tr><td></td><td></td><td>" + "Sem produtos" + "</td></tr>").appendTo("#content");
+        }
     }
     
     function load() {
@@ -150,10 +211,41 @@
         })
     }
 
-
     function labelModal() {
         $("#labelModal").on('show.bs.modal', function (event) {
-            
+            var button = $(event.relatedTarget);
+            var action = button.data('action');
+            var id = button.data('id');
+            var searchLabel = $("#searchLabel");
+            searchLabel.unbind();
+            var modal = $(this);
+            //if (action === "search") {
+                modal.find('.modal-title').text("Buscar Produto - Marca");
+                modal.find('#search-label').val("");
+                searchLabel.click(function () {
+                    searchByLabel($("#search-label").val());
+                    $('#labelModal').modal('toggle');
+                });
+            //}
+        })
+    }
+
+    function typeModal() {
+        $("#typeModal").on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var action = button.data('action');
+            var id = button.data('id');
+            var typeLabel = $("#searchType");
+            typeLabel.unbind();
+            var modal = $(this);
+            //if (action === "search") {
+                modal.find('.modal-title').text("Buscar Produto - Tipo");
+                modal.find('#search-type').val("");
+                typeLabel.click(function () {
+                    searchByType($("#search-type").val());
+                    $('#typeModal').modal('toggle');
+                });
+            //}
         })
     }
 </script>

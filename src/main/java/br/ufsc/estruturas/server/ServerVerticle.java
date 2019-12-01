@@ -1,7 +1,7 @@
 package br.ufsc.estruturas.server;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import br.ufsc.estruturas.data.DataProducts;
 import br.ufsc.estruturas.indexation.DirInvertedIndex;
@@ -9,6 +9,7 @@ import br.ufsc.estruturas.model.Product;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -29,14 +30,16 @@ public class ServerVerticle extends AbstractVerticle {
 		
 		//Criação das Rotas
 		Router router = Router.router(vertx);		
+		
 		router.route().handler(BodyHandler.create());
 		router.post("/api/products").handler(this::addProduct);
 		router.get("/api/products").handler(this::getAll);
 		router.post("/api/label").handler(this::getProductsByLabel);
+		router.post("/api/type").handler(this::getProductsByType);
 		router.route("/").handler(ctx -> {
 			ctx.response().sendFile("assets/index.html");
 		});
-		
+
 		//Iniciando HttpServer na porta 9000
 		vertx.createHttpServer().requestHandler(router::accept).listen(config().getInteger("http.port", 9000),
 				result -> {
@@ -62,28 +65,52 @@ public class ServerVerticle extends AbstractVerticle {
 			Product[] products = dataProducts.getProducts();
 			String json = Json.encodePrettily(products);
 			routingContext.response().putHeader("content-type", "application/json; charset=utf-8").end(json);	
-		} catch (Exception e) {
-			//TODO: handle exception
+		} catch (Exception e) {			
+			e.printStackTrace();
 		}		
 	}
 
 	/** 
-	 * Metodo responsavel responder a requisição do tipo GET
+	 * Metodo responsavel responder a requisição do tipo POST
 	 * Ele busca todos os produtos por Label, converte eles em json e atribui esse
 	 * json ao corpo da requisição. 
 	 * @param routingContext
 	*/
 	private void getProductsByLabel(RoutingContext routingContext) {
 		try {
-			List<Product> products = dataProducts.getByLabel(routingContext.getBodyAsString());
+			JsonObject jsonObject = routingContext.getBodyAsJson();
+			List<Product> products = dataProducts.getByLabel(jsonObject.getString("label"));
 			String json = Json.encodePrettily(products);
 			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
 		 		.end(Json.encodePrettily(json));	
-		} catch (Exception e) {
-			//TODO: handle exception
-		}		
+		} catch (NullPointerException e) {
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(null));	
+		} catch (Exception ex){
+
+		}	
 	}
 
+	/** 
+	 * Metodo responsavel responder a requisição do tipo POST
+	 * Ele busca todos os produtos por Type, converte eles em json e atribui esse
+	 * json ao corpo da requisição. 
+	 * @param routingContext
+	*/
+	private void getProductsByType(RoutingContext routingContext) {
+		try {
+			JsonObject jsonObject = routingContext.getBodyAsJson();
+			List<Product> products = dataProducts.getByType(jsonObject.getString("type"));
+			String json = Json.encodePrettily(products);
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(json));	
+		} catch (NullPointerException e) {
+			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
+		 		.end(Json.encodePrettily(null));	
+		} catch (Exception ex){
+
+		}	
+	}
 	
 	/** 
 	 * Metodo responsavel responder a requisição do tipo POST
@@ -108,8 +135,8 @@ public class ServerVerticle extends AbstractVerticle {
 		Product p2 = new Product("Lã de aço", "BomBril", "Limpeza", "2");
 		Product p3 = new Product("Cheetos", "Nestle", "Salgadinho", "12");
 
-		this.dataProducts = new DataProducts(new Product[10], new DirInvertedIndex(new HashMap<>()),
-				new DirInvertedIndex(new HashMap<>()));
+		this.dataProducts = new DataProducts(new Product[10], new DirInvertedIndex(new TreeMap<>(String.CASE_INSENSITIVE_ORDER)),
+				new DirInvertedIndex(new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));
 
 		dataProducts.insertProduct(p);
 		dataProducts.insertProduct(p1);

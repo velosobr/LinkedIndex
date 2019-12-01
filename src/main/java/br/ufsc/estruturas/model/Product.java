@@ -5,6 +5,7 @@ public class Product {
 	private String label;
 	private String type;
 	private String value;
+	private int id;
 
 	public Product(){
 		
@@ -23,6 +24,20 @@ public class Product {
 		this.type = type;
 		this.value = value;
 	}
+
+	/** 
+	 * @return int
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/** 
+	 * @param id
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}	
 	
 	/** 
 	 * @return String

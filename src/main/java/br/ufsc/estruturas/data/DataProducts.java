@@ -40,39 +40,6 @@ public class DataProducts {
 	public void setProducts(Product[] products) {
 		this.products = products;
 	}
-
-	
-	/** 
-	 * @return DirInvertedIndex
-	 */
-	public DirInvertedIndex getDirByLabel() {
-		return dirByLabel;
-	}
-
-	
-	/** 
-	 * @param dirByLabel
-	 */
-	public void setDirByLabel(DirInvertedIndex dirByLabel) {
-		this.dirByLabel = dirByLabel;
-	}
-
-	
-	/** 
-	 * @return DirInvertedIndex
-	 */
-	public DirInvertedIndex getDirByType() {
-		return dirByType;
-	}
-
-	
-	/** 
-	 * @param dirByType
-	 */
-	public void setDirByType(DirInvertedIndex dirByType) {
-		this.dirByType = dirByType;
-	}
-
 	
 	/** 
 	 * @param product
@@ -92,6 +59,19 @@ public class DataProducts {
 	public List<Product> getByLabel(String label) {
 		List<Product> filtred = new ArrayList<Product>();
 		List<Integer> indexs = dirByLabel.consulta(label);
+		for (int i : indexs) {
+			filtred.add(products[i]);
+		}
+		return filtred;
+	}
+
+	/** 
+	 * @param type
+	 * @return List<Product>
+	 */
+	public List<Product> getByType(String type) {
+		List<Product> filtred = new ArrayList<Product>();
+		List<Integer> indexs = dirByType.consulta(type);
 		for (int i : indexs) {
 			filtred.add(products[i]);
 		}
