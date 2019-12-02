@@ -36,6 +36,13 @@ Execute o seguinte comando no terminal:
 mvn clean package
 ```
 
+### Para rodar o build
+
+Execute o seguinte comando no terminal:
+
+```
+java -jar target/vertxapi-0.0.1-SNAPSHOT-RELEASE.jar
+```
 
 ## Para acessar a página web utilize 
 
