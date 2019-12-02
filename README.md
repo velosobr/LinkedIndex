@@ -41,7 +41,7 @@ mvn clean package
 Execute o seguinte comando no terminal:
 
 ```
-java -jar target/vertxapi-0.0.1-SNAPSHOT-RELEASE.jar
+java -jar target/LinkedListProject-0.0.1-SNAPSHOT-RELEASE
 ```
 
 ## Para acessar a página web utilize 
